@@ -1,0 +1,382 @@
+CONTAINER-NETWORK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI
+
+    containerMIBs
+        FROM Intel-SA-MIB
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--*****************************************************************************
+--
+-- MODULE IDENTITY AND REVISION GROUP
+--
+--*****************************************************************************
+
+containerNetwork    MODULE-IDENTITY
+    LAST-UPDATED    "201708151700Z" -- coordinated universal time UTC format is YYMMDDHHmmZ
+    ORGANIZATION    "Intel, Server Management Software"
+    CONTACT-INFO    " "
+    DESCRIPTION     "This SNMP MIB module retrieves information about interfaces
+                     statistics inside the container.
+
+                    Version:  1.0   08/15/2017
+
+                    Intel copyright information 2017"
+                    ::= { containerMIBs 6 }
+
+-------------------------------------------------------------------------------
+-- Container Network Interface table
+-------------------------------------------------------------------------------
+
+interfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF InterfaceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This Group defines the container interfaces stats."
+    ::= { containerNetwork 1 }
+
+interfaceTableEntry  OBJECT-TYPE
+    SYNTAX      InterfaceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED ifaceContainerId, ifDescr }
+    DESCRIPTION
+             "This Group defines the container interfaces stats table entry."
+    ::= { interfaceTable 1 }
+
+InterfaceTableEntry        ::= SEQUENCE {
+    ifaceContainerId       SnmpAdminString,
+    ifDescr                SnmpAdminString,
+    ifInPkts               Counter64,
+    ifInOctets             Counter64,
+    ifInDiscards           Counter64,
+    ifInErrors             Counter64,
+    ifOutPkts              Counter64,
+    ifOutOctets            Counter64,
+    ifOutDiscards          Counter64,
+    ifOutErrors            Counter64
+}
+
+ifaceContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { interfaceTableEntry 1 }
+
+ifDescr  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the interface."
+    ::= { interfaceTableEntry 2 }
+
+ifInPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of packets received."
+    ::= { interfaceTableEntry 3 }
+
+ifInOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of bytes received."
+    ::= { interfaceTableEntry 4 }
+
+ifInDiscards  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of packets dropped
+             while receiving."
+    ::= { interfaceTableEntry 5 }
+
+ifInErrors  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of receive errors
+             encountered."
+    ::= { interfaceTableEntry 6 }
+
+ifOutPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of packets transmitted."
+    ::= { interfaceTableEntry 7 }
+
+ifOutOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of bytes transmitted."
+    ::= { interfaceTableEntry 8 }
+
+ifOutDiscards  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of packets dropped
+             while transmitting."
+    ::= { interfaceTableEntry 9 }
+
+ifOutErrors  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the cumulative count of transmit errors
+             encountered."
+    ::= { interfaceTableEntry 10 }
+
+-------------------------------------------------------------------------------
+-- Container Network TCP table
+-------------------------------------------------------------------------------
+
+tcpTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TcpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This Group defines the container UDP connections stats."
+    ::= { containerNetwork 2 }
+
+tcpTableEntry  OBJECT-TYPE
+    SYNTAX      TcpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED tcpContainerId, tcpVersion }
+    DESCRIPTION
+             "This Group defines the container UDP connections stats table entry."
+    ::= { tcpTable 1 }
+
+TcpTableEntry        ::= SEQUENCE {
+    tcpContainerId   SnmpAdminString,
+    tcpVersion       SnmpAdminString,
+    tcpClose         Counter64,
+    tcpCloseWait     Counter64,
+    tcpClosing       Counter64,
+    tcpEstablished   Counter64,
+    tcpFinWait1      Counter64,
+    tcpFinWait2      Counter64,
+    tcpLastAck       Counter64,
+    tcpListen        Counter64,
+    tcpSynRecv       Counter64,
+    tcpSynSent       Counter64,
+    tcpTimeWait      Counter64
+}
+
+tcpContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { tcpTableEntry 1 }
+
+tcpVersion  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the TCP version."
+    ::= { tcpTableEntry 2 }
+
+tcpClose  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Close>."
+    ::= { tcpTableEntry 3 }
+
+tcpCloseWait  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Close_Wait>."
+    ::= { tcpTableEntry 4 }
+
+tcpClosing  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Closing>."
+    ::= { tcpTableEntry 5 }
+
+tcpEstablished  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Established>."
+    ::= { tcpTableEntry 6 }
+
+tcpFinWait1  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Fin_wait1>."
+    ::= { tcpTableEntry 7 }
+
+tcpFinWait2  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Fin_wait2>."
+    ::= { tcpTableEntry 8 }
+
+tcpLastAck  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Listen_Ack>."
+    ::= { tcpTableEntry 9 }
+
+tcpListen  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Listen>."
+    ::= { tcpTableEntry 10 }
+
+tcpSynRecv  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Syn_Recv>."
+    ::= { tcpTableEntry 11 }
+
+tcpSynSent  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Syn_Sent>."
+    ::= { tcpTableEntry 12 }
+
+tcpTimeWait  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of TCP connections in state
+             <Time_Wait>."
+    ::= { tcpTableEntry 13 }
+
+-------------------------------------------------------------------------------
+-- Container Network UDP table
+-------------------------------------------------------------------------------
+
+udpTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UdpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This Group defines the container UDP connections stats."
+    ::= { containerNetwork 3 }
+
+udpTableEntry  OBJECT-TYPE
+    SYNTAX      UdpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED udpContainerId, tcpVersion }
+    DESCRIPTION
+             "This Group defines the container UDP connections stats table entry."
+    ::= { udpTable 1 }
+
+UdpTableEntry        ::= SEQUENCE {
+    udpContainerId   SnmpAdminString,
+    udpVersion       SnmpAdminString,
+    udpListen        Counter64,
+    udpDropped       Counter64,
+    udpRxQueued      Counter64,
+    udpTxQueued      Counter64
+}
+
+udpContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { udpTableEntry 1 }
+
+udpVersion  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the UDP version."
+    ::= { udpTableEntry 2 }
+
+udpListen  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of UDP sockets in state <Listen>."
+    ::= { udpTableEntry 3 }
+
+udpDropped  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of UDP packets dropped by the IP
+             stack."
+    ::= { udpTableEntry 4 }
+
+udpRxQueued  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of packets Queued for Receieve."
+    ::= { udpTableEntry 5 }
+
+udpTxQueued  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of packets Queued for Transmit."
+    ::= { udpTableEntry 6 }
+
+END

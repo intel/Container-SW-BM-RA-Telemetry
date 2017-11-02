@@ -1,0 +1,3 @@
+bin**
+obj**
+**/collectd_scripts/patch/*

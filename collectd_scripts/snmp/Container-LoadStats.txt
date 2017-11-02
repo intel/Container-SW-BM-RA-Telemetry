@@ -1,0 +1,110 @@
+CONTAINER-LOADSTATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI
+
+    containerMIBs
+        FROM Intel-SA-MIB
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--*****************************************************************************
+--
+-- MODULE IDENTITY AND REVISION GROUP
+--
+--*****************************************************************************
+
+containerLoadStats  MODULE-IDENTITY
+    LAST-UPDATED    "201708151700Z" -- coordinated universal time UTC format is YYMMDDHHmmZ
+    ORGANIZATION    "Intel, Server Management Software"
+    CONTACT-INFO    " "
+    DESCRIPTION     "This SNMP MIB module retreives container tasks load stats
+                     from the kernel.
+
+                    Version:  1.0   08/15/2017
+
+                    Intel copyright information 2017"
+                    ::= { containerMIBs 4 }
+
+-------------------------------------------------------------------------------
+-- Container Load Stats scalars
+-------------------------------------------------------------------------------
+
+nrTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NrTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This group defines container tasks load stats."
+    ::= { containerLoadStats 1 }
+
+nrTableEntry  OBJECT-TYPE
+    SYNTAX      NrTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED nrContainerId }
+    DESCRIPTION
+             "This group defines container tasks load stats table entry."
+    ::= { nrTable 1 }
+
+NrTableEntry            ::= SEQUENCE {
+    nrContainerId       SnmpAdminString,
+    nrIoWait            Counter64,
+    nrRunning           Counter64,
+    nrSleeping          Counter64,
+    nrStopped           Counter64,
+    nrUninterruptible   Counter64
+}
+
+nrContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { nrTableEntry 1 }
+
+nrIoWait  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of sleeping tasks."
+    ::= { nrTableEntry 2 }
+
+nrRunning  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of running tasks."
+    ::= { nrTableEntry 3 }
+
+nrSleeping  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of tasks in stopped state."
+    ::= { nrTableEntry 4 }
+
+nrStopped  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of tasks in uninterruptible
+             state."
+    ::= { nrTableEntry 5 }
+
+nrUninterruptible  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of tasks waiting on IO."
+    ::= { nrTableEntry 6 }
+
+END

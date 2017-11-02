@@ -1,0 +1,259 @@
+CONTAINER-FS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI
+
+    containerMIBs
+        FROM Intel-SA-MIB
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--*****************************************************************************
+--
+-- MODULE IDENTITY AND REVISION GROUP
+--
+--*****************************************************************************
+
+containerFs         MODULE-IDENTITY
+    LAST-UPDATED    "201708151700Z" -- coordinated universal time UTC format is YYMMDDHHmmZ
+    ORGANIZATION    "Intel, Server Management Software"
+    CONTACT-INFO    " "
+    DESCRIPTION     "This SNMP MIB module collects information about the
+                    filesystem of the container.
+
+                    Version:  1.0   08/15/2017
+
+                    Intel copyright information 2017"
+                    ::= { containerMIBs 2 }
+
+-------------------------------------------------------------------------------
+-- Container Filesystem table
+-------------------------------------------------------------------------------
+
+fsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This Group defines container filesystem table."
+    ::= { containerFs 1 }
+
+fsTableEntry  OBJECT-TYPE
+    SYNTAX      FsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED fsContainerId, fsDevice }
+    DESCRIPTION
+             "This Group defines the container filesystem table entry."
+    ::= { fsTable 1 }
+
+FsTableEntry           ::= SEQUENCE {
+    fsContainerId      SnmpAdminString,
+    fsDevice           SnmpAdminString,
+    fsType             Counter64,
+    fsCapacity         Counter64,
+    fsUsage            Counter64,
+    fsBaseUsage        Counter64,
+    fsAvaliable        Counter64,
+    fsInodes           Counter64,
+    fsInodesFree       Counter64,
+    fsReadsCompleted   Counter64,
+    fsReadsMerged      Counter64,
+    fsSectorsRead      Counter64,
+    fsReadTime         Counter64,
+    fsWritesCompleted  Counter64,
+    fsWritesMerged     Counter64,
+    fsSectorsWritten   Counter64,
+    fsWriteTime        Counter64,
+    fsIoInProgress     Counter64,
+    fsIoTime           Counter64,
+    fsWeightedIoTime   Counter64
+}
+
+fsContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { fsTableEntry 1 }
+
+fsDevice  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the block device
+             name associated with the container filesystem."
+    ::= { fsTableEntry 2 }
+
+fsType  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the type of the
+             container filesystem."
+    ::= { fsTableEntry 3 }
+
+fsCapacity  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of bytes that can be consumed by
+             the container on this filesystem."
+    ::= { fsTableEntry 4 }
+
+fsUsage  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of bytes that is consumed by the
+             container on this filesystem."
+    ::= { fsTableEntry 5 }
+
+fsBaseUsage  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the base usage that is consumed by the
+             container's writable layer."
+    ::= { fsTableEntry 6 }
+
+fsAvaliable  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of bytes available for non-root
+             user."
+    ::= { fsTableEntry 7 }
+
+fsInodes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of Inodes."
+    ::= { fsTableEntry 8 }
+
+fsInodesFree  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of available Inodes."
+    ::= { fsTableEntry 9 }
+
+fsReadsCompleted  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the total number of reads completed
+             successfully."
+    ::= { fsTableEntry 10 }
+
+fsReadsMerged  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of reads merged. Reads and writes
+             which are adjacent to each other may be merged for efficiency.
+             Thus two 4K reads may become one 8K read before it is ultimately
+             handed to the disk, and so it will be counted (and queued) as only
+             one I/O. This field lets you know how often this was done."
+    ::= { fsTableEntry 11 }
+
+fsSectorsRead  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the total number of sectors read successfully."
+    ::= { fsTableEntry 12 }
+
+fsReadTime  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the total number of milliseconds spent by
+             all reads."
+    ::= { fsTableEntry 13 }
+
+fsWritesCompleted  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the total number of writes completed
+             successfully."
+    ::= { fsTableEntry 14 }
+
+fsWritesMerged  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of writes merged. Reads and writes
+             which are adjacent to each other may be merged for efficiency.
+             Thus two 4K reads may become one 8K read before it is ultimately
+             handed to the disk, and so it will be counted (and queued) as only
+             one I/O. This field lets you know how often this was done."
+    ::= { fsTableEntry 15 }
+
+fsSectorsWritten  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the total number of sectors written
+             successfully."
+    ::= { fsTableEntry 16 }
+
+fsWriteTime  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the total number of milliseconds spent by
+             all writes."
+    ::= { fsTableEntry 17 }
+
+fsIoInProgress  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of I/Os currently in progress. The
+             only field that should go to zero. Incremented as requests are
+             given to appropriate struct request_queue and decremented as they
+             finish."
+    ::= { fsTableEntry 18 }
+
+fsIoTime  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of milliseconds spent doing I/Os."
+    ::= { fsTableEntry 19 }
+
+fsWeightedIoTime  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the weighted number of milliseconds spent
+             doing I/Os."
+    ::= { fsTableEntry 20 }
+
+END

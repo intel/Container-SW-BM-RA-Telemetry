@@ -1,0 +1,91 @@
+---
+###########################################################
+# CAdvisor specific settings
+###########################################################
+
+#
+# Documentation: https://github.com/maier/cadvisor-collectd/wiki/Configuring-CAdvisor
+#
+
+###########################################################
+# Host system metrics
+###########################################################
+system_enabled: true
+system_docker_only: true
+system_fs_metrics: true
+system_services:
+  options:
+    include_mounts: false
+    include_sockets: false
+    include_docker_scopes: true
+    include_system_slice: false
+    include_user_slice: false
+    include_other_slices: false
+  include:
+  exclude:
+    - "*"
+
+############################################################
+# Docker specific settings
+############################################################
+docker_enabled: false
+docker_socket: "/var/run/docker.sock"
+docker_containers:
+  - "*"
+
+###########################################################
+# metric name manipulation (namespace)
+###########################################################
+ns_host: "{cn}"
+ns_plugin: "cadvisor-"
+
+###########################################################
+# Metric control, which metrics to forward to Collectd
+###########################################################
+metrics_cpu:
+  - all
+  #- none
+  #- load_average
+  #- usage
+  #- system
+  #- total
+  #- user
+metrics_diskio:
+  - all
+  #- none
+  #- io_merged
+  #- io_queued
+  #- io_service_bytes
+  #- io_service_time
+  #- io_serviced
+  #- io_time
+  #- io_wait_time
+  #- sectors
+metrics_load_stats:
+  - all
+  #- none
+  #- nr_sleeping
+  #- nr_running
+  #- nr_stopped
+  #- nr_uninterruptible
+  #- nr_io_wait
+metrics_memory:
+  - all
+  #- none
+  #- usage
+  #- working_set
+  #- container_data
+  #- hierarchial_data
+metrics_network:
+  - all
+  #- none
+  #- rx_bytes
+  #- tx_bytes
+  #- rx_dropped
+  #- tx_dropped
+  #- rx_errors
+  #- tx_errors
+  #- rx_packets
+  #- tx_packets
+
+# END

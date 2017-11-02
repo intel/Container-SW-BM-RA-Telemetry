@@ -1,0 +1,131 @@
+CONTAINER-IOSTATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI
+
+    containerMIBs
+        FROM Intel-SA-MIB
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--*****************************************************************************
+--
+-- MODULE IDENTITY AND REVISION GROUP
+--
+--*****************************************************************************
+
+containerIoStats    MODULE-IDENTITY
+    LAST-UPDATED    "201708151700Z" -- coordinated universal time UTC format is YYMMDDHHmmZ
+    ORGANIZATION    "Intel, Server Management Software"
+    CONTACT-INFO    " "
+    DESCRIPTION     "This SNMP MIB module collects information about container
+                     disk I/O services statistics.
+
+                    Version:  1.0   08/15/2017
+
+                    Intel copyright information 2017"
+                    ::= { containerMIBs 3 }
+
+
+-------------------------------------------------------------------------------
+-- Container CPU tables
+-------------------------------------------------------------------------------
+
+ioServiceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IoServiceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This Group defines container I/O services stats."
+    ::= { containerIoStats 1 }
+
+ioServiceTableEntry  OBJECT-TYPE
+    SYNTAX      IoServiceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED ioContainerId, ioService, ioMajorMinor }
+    DESCRIPTION
+             "This Group defines the container I/O services stats table entry."
+    ::= { ioServiceTable 1 }
+
+IoServiceTableEntry       ::= SEQUENCE {
+    ioContainerId         SnmpAdminString,
+    ioService             SnmpAdminString,
+    ioMajorMinor          SnmpAdminString,
+    ioAsync               Counter64,
+    ioRead                Counter64,
+    ioSync                Counter64,
+    ioTotal               Counter64,
+    ioWrite               Counter64
+}
+
+ioContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { ioServiceTableEntry 1 }
+
+ioService  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the I/O service."
+    ::= { ioServiceTableEntry 2 }
+
+ioMajorMinor  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the device major
+             and minor identifiers."
+    ::= { ioServiceTableEntry 3 }
+
+ioAsync  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines a cumulative count of service asyncs
+             completed."
+    ::= { ioServiceTableEntry 4 }
+
+ioRead  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines a cumulative count of service reads completed."
+    ::= { ioServiceTableEntry 5 }
+
+ioSync  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines a cumulative count of service syncs completed."
+    ::= { ioServiceTableEntry 6 }
+
+ioTotal  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines a total number of service I/Os in progress."
+    ::= { ioServiceTableEntry 7 }
+
+ioWrite  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines a cumulative count of service writes
+             completed."
+    ::= { ioServiceTableEntry 8 }
+
+END

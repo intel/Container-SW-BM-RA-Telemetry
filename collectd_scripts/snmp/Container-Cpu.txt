@@ -1,0 +1,188 @@
+CONTAINER-CPU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI
+
+    containerMIBs
+        FROM Intel-SA-MIB
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--*****************************************************************************
+--
+-- MODULE IDENTITY AND REVISION GROUP
+--
+--*****************************************************************************
+
+containerCpu        MODULE-IDENTITY
+    LAST-UPDATED    "201708151500Z" -- coordinated universal time UTC format is YYMMDDHHmmZ
+    ORGANIZATION    "Intel, Server Management Software"
+    CONTACT-INFO    " "
+    DESCRIPTION     "This SNMP MIB module accounts cpu consumption for user and
+                    kernel space inside the container.
+
+                    Version:  1.0   08/15/2017
+
+                    Intel copyright information 2017"
+                    ::= { containerMIBs 1 }
+
+-------------------------------------------------------------------------------
+-- Container CPU scalars
+-------------------------------------------------------------------------------
+
+cpuUsageTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpuUsageTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This group defines container CPU usage."
+    ::= { containerCpu 1 }
+
+cpuUsageTableEntry  OBJECT-TYPE
+    SYNTAX      CpuUsageTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED cpuContainerId }
+    DESCRIPTION
+             "This group defines container CPU usage table entry."
+    ::= { cpuUsageTable 1 }
+
+CpuUsageTableEntry           ::= SEQUENCE {
+    cpuContainerId           SnmpAdminString,
+    cpuTotalUsage            Counter64,
+    cpuUserUsage             Counter64,
+    cpuSystemUsage           Counter64,
+    cpuCfsPeriods            Counter64,
+    cpuCfsThrottledPeriods   Counter64,
+    cpuCfsThrottledTime      Counter64,
+    cpuAverageLoad           Counter64
+}
+
+cpuContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { cpuUsageTableEntry 1 }
+
+cpuTotalUsage  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "ns"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The counter defines container total CPU usage."
+    ::= { cpuUsageTableEntry 2 }
+
+cpuUserUsage  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "ns"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The counter defines container time spent in user space."
+    ::= { cpuUsageTableEntry 3 }
+
+cpuSystemUsage  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "ns"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines time spent in kernel space."
+    ::= { cpuUsageTableEntry 4 }
+
+cpuCfsPeriods  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines container total number of elapsed enforcement
+             intervals."
+    ::= { cpuUsageTableEntry 5 }
+
+cpuCfsThrottledPeriods  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines container total number of times tasks in the
+             cgroup have been throttled."
+    ::= { cpuUsageTableEntry 6 }
+
+cpuCfsThrottledTime  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "ns"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines container total time duration for which tasks
+             in the cgroup have been throttled."
+    ::= { cpuUsageTableEntry 7 }
+
+cpuAverageLoad  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines container smoothed average of number of
+             runnable threads x 1000 over the last 10 seconds."
+    ::= { cpuUsageTableEntry 8 }
+
+-------------------------------------------------------------------------------
+-- Container CPU Core usage table
+-------------------------------------------------------------------------------
+
+cpuCoreUsageTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpuCoreUsageTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This group defines container per CPU/core usage."
+    ::= { containerCpu 2 }
+
+cpuCoreUsageTableEntry  OBJECT-TYPE
+    SYNTAX      CpuCoreUsageTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED cpuCoreContainerId, cpuCoreIndex }
+    DESCRIPTION
+             "This group defines container CPU/core usage table entry."
+    ::= { cpuCoreUsageTable 1 }
+
+CpuCoreUsageTableEntry        ::= SEQUENCE {
+    cpuCoreContainerId        SnmpAdminString,
+    cpuCoreIndex              SnmpAdminString,
+    cpuCoreUsage              Counter64
+}
+
+cpuCoreContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { cpuCoreUsageTableEntry 1 }
+
+cpuCoreIndex  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the CPU/core number
+             of the cpu usage group."
+    ::= { cpuCoreUsageTableEntry 2 }
+
+cpuCoreUsage  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "ns"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines CPU/core usage."
+    ::= { cpuCoreUsageTableEntry 3 }
+
+END

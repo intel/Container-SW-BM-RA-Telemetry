@@ -1,0 +1,187 @@
+CONTAINER-MEMORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI
+
+    containerMIBs
+        FROM Intel-SA-MIB
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--*****************************************************************************
+--
+-- MODULE IDENTITY AND REVISION GROUP
+--
+--*****************************************************************************
+
+containerMemory     MODULE-IDENTITY
+    LAST-UPDATED    "201708151700Z" -- coordinated universal time UTC format is YYMMDDHHmmZ
+    ORGANIZATION    "Intel, Server Management Software"
+    CONTACT-INFO    " "
+    DESCRIPTION     "This SNMP MIB module retreives information about container
+                     memory usage.
+
+                    Version:  1.0   08/15/2017
+
+                    Intel copyright information 2017"
+                    ::= { containerMIBs 5 }
+
+-------------------------------------------------------------------------------
+-- Container Memory scalars
+-------------------------------------------------------------------------------
+
+memoryTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MemoryTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This Group defines the page faults on the container system."
+    ::= { containerMemory 1 }
+
+memoryTableEntry  OBJECT-TYPE
+    SYNTAX      MemoryTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED memoryContainerId }
+    DESCRIPTION
+             "This Group defines the Memory Table Entry."
+    ::= { memoryTable 1 }
+
+MemoryTableEntry           ::= SEQUENCE {
+    memoryContainerId      SnmpAdminString,
+    memoryUsage            Counter64,
+    memoryCache            Counter64,
+    memoryRss              Counter64,
+    memorySwap             Counter64,
+    memoryFailcnt          Counter64,
+    memoryWorkingSet       Counter64
+}
+
+memoryContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { memoryTableEntry 1 }
+
+memoryUsage  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The counter defines the current memory usage, this includes all
+             memory regardless of when it was accessed."
+    ::= { memoryTableEntry 2 }
+
+memoryCache  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The counter defines the number of bytes of page cache memory."
+    ::= { memoryTableEntry 3 }
+
+memoryRss  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The counter defines the number of bytes of page cache memory."
+    ::= { memoryTableEntry 4 }
+
+memorySwap  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The counter defines the amount of swap currently used by the
+             processes in this cgroup."
+    ::= { memoryTableEntry 5 }
+
+memoryFailcnt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of memory usage hits limits."
+    ::= { memoryTableEntry 6 }
+
+memoryWorkingSet  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the amount of working set memory, this
+             includes recently accessed memory, dirty memory, and kernel
+             memory. Working set is <= usage."
+    ::= { memoryTableEntry 7 }
+
+-------------------------------------------------------------------------------
+-- Container Memory source data tables
+-------------------------------------------------------------------------------
+
+memoryDataTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MemoryDataTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This Group defines the page faults on the system."
+    ::= { containerMemory 2 }
+
+memoryDataTableEntry  OBJECT-TYPE
+    SYNTAX      MemoryDataTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    INDEX       { IMPLIED memoryDataContainerId, memoryDataSource }
+    DESCRIPTION
+             "This Group defines the Memory Data Table Entry."
+    ::= { memoryDataTable 1 }
+
+MemoryDataTableEntry        ::= SEQUENCE {
+    memoryDataContainerId   SnmpAdminString,
+    memoryDataSource        SnmpAdminString,
+    memoryPageFault         Counter64,
+    memoryPageMajorFault    Counter64
+}
+
+memoryDataContainerId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the container identifier."
+    ::= { memoryDataTableEntry 1 }
+
+memoryDataSource  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The textual string describes the Memory Data source."
+    ::= { memoryDataTableEntry 2 }
+
+memoryPageFault  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of page faults."
+    ::= { memoryDataTableEntry 3 }
+
+memoryPageMajorFault  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This counter defines the number of major page faults."
+    ::= { memoryDataTableEntry 4 }
+
+END
