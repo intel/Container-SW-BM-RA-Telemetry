@@ -1,0 +1,50 @@
+diff --git a/src/cadvisor/python/cadvisor-metrics.py b/src/cadvisor/python/cadvisor-metrics.py
+index a54e2d5..5abd47f 100644
+--- a/src/cadvisor/python/cadvisor-metrics.py
++++ b/src/cadvisor/python/cadvisor-metrics.py
+@@ -37,6 +37,7 @@ class CAdvisorMetrics(CAdvisor):
+         # hostname = metric.host
+         # metric.host = self.gen_host_name(hostname, container_name, container_id)
+ 
++        metric.host = self.gen_host_name(None, container_name, container_id)
+         metric.plugin = self.gen_plugin_name(None, container_name, container_id, plugin)
+         if plugin_instance:
+             metric.plugin_instance = plugin_instance
+diff --git a/src/cadvisor/python/cadvisor.py b/src/cadvisor/python/cadvisor.py
+index 27300d2..6a483ff 100644
+--- a/src/cadvisor/python/cadvisor.py
++++ b/src/cadvisor/python/cadvisor.py
+@@ -54,6 +54,7 @@ class CAdvisor(object):
+ 
+         self.system_enabled = self.config.get('system_enabled', False)
+         self.system_fs_metrics = self.config.get('system_fs_metrics', False)
++        self.system_docker_only = self.config.get('system_docker_only', False)
+         self.system_services = self.config.get('system_services', {
+                                                'options': {
+                                                    'include_mounts': False,
+@@ -290,7 +291,11 @@ class CAdvisor(object):
+         #
+         self.set_cadvisor_connect_info()
+ 
+-        url = "http://{}:{}/api/v2.0/stats?recursive=true&count=1".format(self.host, self.port)
++        docker = ''
++        if self.system_docker_only:
++            docker = 'type=docker&'
++
++        url = "http://{}:{}/api/v2.0/stats?{}recursive=true&count=1".format(self.host, self.port, docker)
+         stats = {}
+         try:
+             response = urllib2.urlopen(url, None, 5)
+@@ -567,6 +572,12 @@ class CAdvisor(object):
+                     self.output_metrics('docker', 0, metrics[service][0], False)
+                 else:
+                     continue
++            elif service[0:8] == '/docker/' and self.system_docker_only:
++                self.set_docker_container_list()
++                for docker_container in self.docker_container_list:
++                    if docker_container['Id'][0:12] == service[8:20]:
++                        self.output_metrics(''.join(docker_container['Names']).replace('/', ''), docker_container['Id'][0:12], metrics[service][0], True)
++                        break
+             else:
+ 
+                 try:
